@@ -13,8 +13,7 @@ class NuevosPokemon {
     }
 }
 class StatsPokemon {
-    constructor(nivel, vida, ataque, defensa, ataqueEspecial, defensaEspecial, velocidad){
-        this.nivel= nivel
+    constructor(vida, ataque, defensa, ataqueEspecial, defensaEspecial, velocidad){
         this.vida= vida
         this.ataque= ataque
         this.defensa= defensa
@@ -92,6 +91,7 @@ const Venusaur= new NuevosPokemon(
     "modesta"
 )
 /*----------------------------------------------------------------------Mewtwo-------------------------------------------------------------------------------*/
+/* 
 const StatsMewtwo = new StatsPokemon(50, 181, 116, 110, 191, 110, 150)
 const Psiquico = new StatsAtaquePokemon("Psiquico", 90, 100, "especial", "psiquico", 10, 0)
 const Bolsombra = new StatsAtaquePokemon("Bola Sombra", 80, 100, "especial", "fantasma", 15, 0)
@@ -110,9 +110,10 @@ const Mewtwo= new NuevosPokemon(
     "presion",
     "modesta"
 )
+*/
 /*-------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
 const equipo = [Charizard, Blastoise, Venusaur]
-const rival = [Mewtwo]
+//const rival = [Mewtwo]
 
 /*---------------------------------------------------------------------Comienzo del combate------------------------------------------------------------------------------*/
 
