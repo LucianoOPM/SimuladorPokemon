@@ -8,4 +8,13 @@ export default class API {
             console.error(err)
         }
     }
+    async getMove(id){
+        try{
+            const req = await fetch (`https://pokeapi.co/api/v2/move/${id}/`)
+            const succ = await req.json()
+            return succ
+        }catch(err){
+            console.error(err)
+        }
+    }
 }

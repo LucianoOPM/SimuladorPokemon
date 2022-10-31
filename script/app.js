@@ -16,6 +16,10 @@ let initApp=async (initCharacterID)=>{
 }
 /*-----------------------------------Coloca a mewtwo en la página-------------------------------------------------- */
 
+let paginaCombate=()=>{
+    //Cambiar el index una tercera vez colocar en los botones los movimientos del pokemon y comenzar a programar el combate usando la api de los movimientos, el daño y la vida de mewtwo
+}
+
 initApp(datosMewtwo)
 
 let cambiarPagina= async(pagina, id)=>{
@@ -46,10 +50,7 @@ let cambiarPagina= async(pagina, id)=>{
 
         evt.preventDefault()
 
-        if(sel1.value || sel2.value || sel3.value || sel4.value == ""){
-            alert("No puede haber ataques vacios")
-            //error, esto no funciona como se supone
-        }else{
+        if(sel1.value != "" && sel2.value != "" && sel3.value != "" && sel4.value != ""){
             if(sel1.value != sel2.value && sel1.value != sel3.value && sel1.value != sel4.value){
                 if(sel2.value != sel3.value && sel2.value != sel4.value){
                     if(sel3.value != sel4.value){
@@ -58,14 +59,16 @@ let cambiarPagina= async(pagina, id)=>{
                         }))
                         paginaCombate()
                     }else{
-                        alert("ataque repetido 3")
+                        alert("Revisa que no tengas ataques repetidos")
                     }
                 }else{
-                    alert("ataque repetido 2")
+                    alert("Revisa que no tengas ataques repetidos")
                 }
             }else{
-                alert("ataque repetido")
+                alert("Revisa que no tengas ataques repetidos")
             }
+        }else{
+            alert("Verifica que no dejes ningún ataque vacio")
         }
     }))
 }

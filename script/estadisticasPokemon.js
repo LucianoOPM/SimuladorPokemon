@@ -1,7 +1,7 @@
-import APIpokemon from "./API.js"
+import API from "./API.js"
 
 
-const movement = new APIpokemon()
+const movement = new API()
 
 let datosAtaques = async(moveID)=>{
     const movedata = await movement.getMove(moveID)
