@@ -4,23 +4,90 @@ import API from "./API.js"
 const api = new API()
 
 let datosMewtwo = 150//numero de ID del pokemon a combatir, en este caso el 150(mewtwo)
+let aleatorio = (Math.floor(Math.random()*4096))//Variable global para poner un shiny
 
-let mtcontenedor = document.querySelector("#contenedorMewtwo")
-let teamcontainer = document.querySelectorAll("#contenedorEquipo img")
+
 
 let initApp=async (initCharacterID)=>{
     const characterData = await api.getPokemon(initCharacterID)
-    const datoMewtwo = characterData.sprites.front_default
+    const datoMewtwo = await characterData.sprites.front_default
+    
+    let mtcontenedor = document.querySelector("#contenedorMewtwo")
     
     mtcontenedor.innerHTML = `<img src="${datoMewtwo}" width="150"></img>`
 }
-/*-----------------------------------Coloca a mewtwo en la página-------------------------------------------------- */
-
-let paginaCombate=()=>{
-    //Cambiar el index una tercera vez colocar en los botones los movimientos del pokemon y comenzar a programar el combate usando la api de los movimientos, el daño y la vida de mewtwo
-}
-
 initApp(datosMewtwo)
+/*-----------------------------------Coloca a mewtwo en la página principal-------------------------------------------------- */
+/* let atacar=(ataque)=>{
+
+}
+let evaluarDamage=(callback)=>{
+    callback(atacar)
+} Verificar si es recomendado usar un callback para hacer la función del daño
+*/
+let efectuarAtaque=(ataqueSeleccionado, dañoAtq, atqTeam, defTeam)=>{
+    console.log(ataqueSeleccionado)
+    //traer datos de mewtwo como la defensa y defensa especial, traer el ataque del pokemon aliado seleccionado, y evaluarlo por el daño y el ataque seleccionado
+}
+/*-----------------Funcion que trae los ataques de la API---------------------------*/
+
+const cambiarACombate= async (infopagina)=>{
+    let mainseleccion = document.querySelector("main")
+        mainseleccion.innerHTML = infopagina
+    let btnataques = document.querySelectorAll("#bataq")
+    
+    const mtwo = await api.getPokemon(datosMewtwo)
+    const datomtwo = await mtwo.sprites.front_default
+    
+    let mtsprite = document.querySelector("#mtwosprite")
+        mtsprite.setAttribute("src", datomtwo)
+/*----------------------------------Coloca a mewtwo en la página de combate------------------------------*/
+    let ataques = localStorage.getItem("movimientosPKM")
+    let parseoAtaques = JSON.parse(ataques)
+    let pkmseleccionado = localStorage.getItem("pkmescogido")
+/*------------------------------Trae los datos del localstorage de los ataques y del pokemon escogido----------------------------------*/
+    btnataques[0].innerText = `${parseoAtaques.ataque1}`
+    btnataques[1].innerText = `${parseoAtaques.ataque2}`
+    btnataques[2].innerText = `${parseoAtaques.ataque3}`
+    btnataques[3].innerText = `${parseoAtaques.ataque4}`
+
+/*--------------------------------Coloca el nombre del ataque en los botones correspondientes.----------------------------------------- */
+
+    const pkmteam = await api.getPokemon(pkmseleccionado)
+    const pkmimg = await pkmteam.sprites.back_default
+    const pkmimgshiny = await pkmteam.sprites.back_shiny
+/*-----------------------------------------Trae datos de las imagenes de los pokemon--------------------------------*/
+
+    let imgpkmteam = document.querySelector("#currentPkm")
+    
+        if(aleatorio == 1){
+            imgpkmteam.setAttribute("src", pkmimgshiny)
+        }else{
+            imgpkmteam.setAttribute("src", pkmimg)
+        }
+/*Coloca la imagen respecto a si es shiny o no*/
+            btnataques.forEach((botonpulsado)=>{
+                botonpulsado.addEventListener("click",(evt)=>{
+                    let btnAtqSel = evt.target.innerText
+                    efectuarAtaque(btnAtqSel)
+                })
+            })
+        }
+
+let inicioCombate=()=>{
+    const pcombate = "html/combate.html"
+    fetch(pcombate)
+    .then((pagina)=>{
+        return pagina.text()
+    })
+    .then((dato)=>{
+        cambiarACombate(dato)
+    })
+    .catch((err)=>{
+        console.error(err)
+    })
+}
+/*------------------------------------Me trae la url de combate.html-----------------------------------*/
 
 let cambiarPagina= async(pagina, id)=>{
     localStorage.setItem("pkmescogido", id)
@@ -57,7 +124,7 @@ let cambiarPagina= async(pagina, id)=>{
                         localStorage.setItem("movimientosPKM", JSON.stringify({
                             "ataque1": sel1.value, "ataque2": sel2.value, "ataque3": sel3.value, "ataque4": sel4.value
                         }))
-                        paginaCombate()
+                        inicioCombate()
                     }else{
                         alert("Revisa que no tengas ataques repetidos")
                     }
@@ -76,8 +143,8 @@ let cambiarPagina= async(pagina, id)=>{
 
 document.addEventListener("DOMContentLoaded",()=>{
     
-    let aleatorio = (Math.floor(Math.random()*4096))
     const url = "html/seleccionAtaques.html"
+    let teamcontainer = document.querySelectorAll("#contenedorEquipo img")
 
     teamcontainer.forEach((pokemon) => {
         pokemon.addEventListener("click",(evt)=>{
