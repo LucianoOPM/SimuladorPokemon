@@ -18,13 +18,11 @@ let initApp=async (initCharacterID)=>{
 }
 initApp(datosMewtwo)
 /*-----------------------------------Coloca a mewtwo en la página principal-------------------------------------------------- */
-let test=(dato)=>{
-    console.log(dato.power)
-    console.log(dato.name)
-    //switch case de los nombres de los ataques, y que cada ataque llame a la funcion "actualizar vida" cuando se escuche el evento "click" en los botones
-}
 
-const renderBarraVida=(vidapkm)=>{
+const renderBarraVida= async(statspkm, atq1, atq2, atq3, atq4)=>{
+
+    let attackbtn = document.querySelectorAll("#bataq")
+    
     let mtwocanvas = document.querySelector("#vidaMewtwo")
     let mtwocontext = mtwocanvas.getContext("2d")
     let vidateam = document.querySelector("#vidaTeam")
@@ -37,10 +35,21 @@ const renderBarraVida=(vidapkm)=>{
     const xPosition = widthBar / 2 - largoBarraVida / 2;
     const yPosition = heightBar / 2 - altoBarraVida / 2;
 
-    switch(vidapkm.name){
+    switch(statspkm.name){
         case "mewtwo":
-            let vidaMtwo = vidapkm.stats[0].base_stat;
+
+            let vidaMtwo = statspkm.stats[0].base_stat;
+            let atqMtwo = statspkm.stats[1].base_stat
+            let atqEsMtwo = statspkm.stats[3].base_stat
+            let defMtwo = statspkm.stats[2].base_stat
+            let defEsMtwo = statspkm.stats[4].base_stat
+            let tipoMtwo1 = statspkm.types[0].type.name
+            let tipoMtwo2 = false
+
             const barraDeMtwo = new HealtBar(xPosition, yPosition, largoBarraVida, altoBarraVida, vidaMtwo, "green")
+            barraDeMtwo.updateHealt(new DamageCalculator(atq1.power, atq2.power, atq3.power, atq4.power, vidaMtwo, atqMtwo, defMtwo, atqEsMtwo, defEsMtwo,
+                atq1.type.name, atq2.type.name, atq3.type.name, atq4.type.name, tipoMtwo1, tipoMtwo2))
+            
 
             const framemwto = ()=>{
                 mtwocontext.clearRect(0,0, widthBar, heightBar)
@@ -48,26 +57,54 @@ const renderBarraVida=(vidapkm)=>{
                 requestAnimationFrame(framemwto)
             }
             framemwto()
+            attackbtn.forEach((boton)=>{
+            boton.addEventListener("click",(evt)=>{
+                vidaMtwo -= 20
+                barraDeMtwo.updateHealt(vidaMtwo)
+            })
+        })
         break
-        case "charizard":
         case "blastoise":
+        case "charizard":
         case "venusaur":
-            let vidaIniciales = vidapkm.stats[0].base_stat
-            const barraVidaIniciales = new HealtBar(xPosition, yPosition, largoBarraVida, altoBarraVida, vidaIniciales, "green")
+
+            let tipo2team;
             
+            if(statspkm.name == "blastoise"){
+                tipo2team = false
+            }else{
+                tipo2team = statspkm.types[1].type.name
+            }
+
+            let vidaIniciales = statspkm.stats[0].base_stat
+            let atqIniciales = statspkm.stats[1].base_stat
+            let defIniciales = statspkm.stats[2].base_stat
+            let atqEsIniciales = statspkm.stats[3].base_stat
+            let defEsIniciales = statspkm.stats[4].base_stat
+            let tipo1Iniciales = statspkm.types[0].type.name
+
+            const barraVidaIniciales = new HealtBar(xPosition, yPosition, largoBarraVida, altoBarraVida, vidaIniciales, "green")
+            barraVidaIniciales.updateHealt(new DamageCalculator(atq1.power, atq2.power, atq3.power, atq4.power, vidaIniciales, atqIniciales, defIniciales, atqEsIniciales, defEsIniciales,
+                atq1.type.name, atq2.type.name, atq3.type.name, atq4.type.name, tipo1Iniciales, tipo2team))
+
             const frameTeam =()=>{
                 vidateamcontext.clearRect(0, 0, widthBar, heightBar)
                 barraVidaIniciales.show(vidateamcontext)
                 requestAnimationFrame(frameTeam)
             }
             frameTeam()
+            attackbtn.forEach((boton)=>{
+                boton.addEventListener("click",(evt)=>{
+                    vidaIniciales -=10
+                    barraVidaIniciales.updateHealt(vidaIniciales)
+                })
+            })
         break
         }
     }
 /*-------------------------------Coloca la barra de vida de los pokemons-----------------------*/
-/*Traer los datos necesarios como caracteristicas del pokemon, y caracteristicas del ataque */
 
-const cambiarACombate= async (infopagina)=>{
+const cambiarACombate= async (infopagina, datorecibido1, datorecibido2, datorecibido3, datorecibido4)=>{
     let mainseleccion = document.querySelector("main")
         mainseleccion.innerHTML = infopagina
     let btnataques = document.querySelectorAll("#bataq")
@@ -75,35 +112,39 @@ const cambiarACombate= async (infopagina)=>{
 
     const mtwo = await api.getPokemon(datosMewtwo)
     const datomtwo = await mtwo
-        renderBarraVida(datomtwo)
+    const atq1Mtwo = await api.getMove("psychic")
+    const atq2Mtwo = await api.getMove("iron-tail")
+    const atq3Mtwo = await api.getMove("energy-ball")
+    const atq4Mtwo = await api.getMove("water-pulse")
+    const atq1MtwoData = await atq1Mtwo
+    const atq2MtwoData = await atq2Mtwo
+    const atq3MtwoData = await atq3Mtwo
+    const atq4MtwoData = await atq4Mtwo
+        renderBarraVida(datomtwo, atq1MtwoData, atq2MtwoData, atq3MtwoData, atq4MtwoData)
+
     
     let mtsprite = document.querySelector("#mtwosprite")
         mtsprite.setAttribute("src", datomtwo.sprites.front_default)
 /*----------------------------------Coloca a mewtwo en la página de combate------------------------------*/
+    let pkmseleccionado = localStorage.getItem("pkmescogido")
+/*------------------------------Trae los datos del localstorage de los ataques y del pokemon escogido----------------------------------*/
+
+    const pkmteam = await api.getPokemon(pkmseleccionado)
+    const datopkmteam = await pkmteam
+        renderBarraVida(datopkmteam, datorecibido1, datorecibido2, datorecibido3, datorecibido4)
+    const pkmimg = await pkmteam.sprites.back_default
+    const pkmimgshiny = await pkmteam.sprites.back_shiny
+/*-----------------------------------------Trae datos de las imagenes de los pokemon--------------------------------*/
+
 
     let ataques = localStorage.getItem("movimientosPKM")//a partir de aqui podría traerme los stats de los ataques seleccionados
     let parseoAtaques = JSON.parse(ataques)
-        for(let i in parseoAtaques){
-            const ataque = await api.getMove(parseoAtaques[i])
-            const datoAtaque = await ataque
-            test(datoAtaque)
-        }
-    
-    let pkmseleccionado = localStorage.getItem("pkmescogido")
-/*------------------------------Trae los datos del localstorage de los ataques y del pokemon escogido----------------------------------*/
 
     btnataques[0].innerText = `${parseoAtaques.ataque1}`
     btnataques[1].innerText = `${parseoAtaques.ataque2}`
     btnataques[2].innerText = `${parseoAtaques.ataque3}`
     btnataques[3].innerText = `${parseoAtaques.ataque4}`
 /*--------------------------------Coloca el nombre del ataque en los botones correspondientes.----------------------------------------- */
-
-    const pkmteam = await api.getPokemon(pkmseleccionado)
-    const datopkmteam = await pkmteam
-        renderBarraVida(datopkmteam)
-    const pkmimg = await pkmteam.sprites.back_default
-    const pkmimgshiny = await pkmteam.sprites.back_shiny
-/*-----------------------------------------Trae datos de las imagenes de los pokemon--------------------------------*/
 
     let imgpkmteam = document.querySelector("#currentPkm")
     
@@ -113,23 +154,16 @@ const cambiarACombate= async (infopagina)=>{
             imgpkmteam.setAttribute("src", pkmimg)
         }
 /*--------------------------Coloca la imagen respecto a si es shiny o no----------------------------*/
-
-    btnataques.forEach((botonpulsado)=>{
-        botonpulsado.addEventListener("click",(evt)=>{
-            let btnAtqSel = evt.target.innerText
-            //reducir la barra de vida en cuestión al boton que se pulsó
-        })
-    })
 }
 
-let cambiarPaginaACombate=()=>{
+let cambiarPaginaACombate=(ataque1,ataque2,ataque3,ataque4)=>{
     const pcombate = "html/combate.html"
     fetch(pcombate)
     .then((pagina)=>{
         return pagina.text()
     })
     .then((dato)=>{
-        cambiarACombate(dato)
+        cambiarACombate(dato, ataque1, ataque2, ataque3, ataque4)
     })
     .catch((err)=>{
         console.error(err)
@@ -166,7 +200,7 @@ let cambiarPagina= async(pagina, id)=>{
         sel4.innerHTML+=`<option value="${ataque.move.name}">${ataque.move.name}</option>`
 /*------------------------------------------Coloca todos los ataques que traje antes en el selec-----------------------------------------------------------------*/
 
-    },fightBtn.addEventListener("click", (evt)=>{
+    },fightBtn.addEventListener("click",async (evt)=>{
 
         evt.preventDefault()
 
@@ -174,10 +208,18 @@ let cambiarPagina= async(pagina, id)=>{
             if(sel1.value != sel2.value && sel1.value != sel3.value && sel1.value != sel4.value){
                 if(sel2.value != sel3.value && sel2.value != sel4.value){
                     if(sel3.value != sel4.value){
-                        localStorage.setItem("movimientosPKM", JSON.stringify({
-                            "ataque1": sel1.value, "ataque2": sel2.value, "ataque3": sel3.value, "ataque4": sel4.value
-                        }))
-                        cambiarPaginaACombate()
+                        const ataque1 = await api.getMove(sel1.value)
+                        const ataque1Data = await ataque1
+                        const ataque2 = await api.getMove(sel2.value)
+                        const ataque2Data = await ataque2
+                        const ataque3 = await api.getMove(sel3.value)
+                        const ataque3Data = await ataque3
+                        const ataque4 = await api.getMove(sel4.value)
+                        const ataque4Data = await ataque4
+                            localStorage.setItem("movimientosPKM", JSON.stringify({
+                                "ataque1": sel1.value, "ataque2": sel2.value, "ataque3": sel3.value, "ataque4": sel4.value
+                            }))
+                        cambiarPaginaACombate(ataque1Data, ataque2Data, ataque3Data, ataque4Data)
                     }else{
                         alert("Revisa que no tengas ataques repetidos")
                     }
